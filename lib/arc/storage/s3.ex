@@ -101,14 +101,21 @@ defmodule Arc.Storage.S3 do
   end
 
   defp default_host do
-    case virtual_host() do
-      true -> "https://#{bucket()}.s3.amazonaws.com"
-      _    -> "https://s3.amazonaws.com/#{bucket()}"
-    end
+    #case virtual_host() do
+    #  true -> "https://#{bucket()}.s3.amazonaws.com"
+    #  _    -> "https://s3.amazonaws.com/#{bucket()}"
+    #end
+    
+    custom_host_url()
   end
 
   defp virtual_host do
     Application.get_env(:arc, :virtual_host) || false
+  end
+  
+  defp custom_host_url do
+    {:ok, custom_host} = Application.fetch_env(:arc, :custom_host)
+    "#{custom_host}/#{bucket()}"
   end
 
   defp bucket do
