@@ -7,12 +7,12 @@ defmodule Arc.Storage.S3 do
     s3_key = Path.join(destination_dir, file.file_name)
     acl = definition.acl(version, {file, scope})
 
-    s3_options =
-      definition.s3_object_headers(version, {file, scope})
-      |> ensure_keyword_list()
-      |> Keyword.put(:acl, acl)
+    #s3_options =
+    #  definition.s3_object_headers(version, {file, scope})
+    #  |> ensure_keyword_list()
+    #  |> Keyword.put(:acl, acl)
 
-    do_put(file, s3_key, s3_options)
+    do_put(file, s3_key)
   end
 
   def url(definition, version, file_and_scope, options \\ []) do
@@ -38,8 +38,8 @@ defmodule Arc.Storage.S3 do
   defp ensure_keyword_list(map) when is_map(map), do: Map.to_list(map)
 
   # If the file is stored as a binary in-memory, send to AWS in a single request
-  defp do_put(file=%Arc.File{binary: file_binary}, s3_key, s3_options) when is_binary(file_binary) do
-    ExAws.S3.put_object(bucket(), s3_key, file_binary, s3_options)
+  defp do_put(file=%Arc.File{binary: file_binary}, s3_key) when is_binary(file_binary) do
+    ExAws.S3.put_object(bucket(), s3_key, file_binary)
     |> ExAws.request()
     |> case do
       {:ok, _res}     -> {:ok, file.file_name}
